@@ -1,4 +1,4 @@
-import { register, findOneByEmail, getUsers, updateUser, deleteUser, setStatus } from '../models/queries.js';
+import { register, findOneByEmail, getUsers, updateUser, deleteUserQuery, setStatusQuery } from '../models/queries.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,7 +8,7 @@ import 'dotenv/config';
 export const home = async (req, res) => {
     res.render('home', {
         title: 'Home',
-        users: await models.getUsers(),
+        users: await getUsers(),
     });
 };
 export const about = (req, res) => {
@@ -44,10 +44,10 @@ export const updateForm = async (req, res) => {
 export const admin = async (req, res) => {
     res.render('admin', {
         title: 'Admin Page',
-        users: await models.getUsers(),
+        users: await getUsers(),
     });
 };
-export const register = async (req, res) => {
+export const registerUser = async (req, res) => {
     const {
         name,
         email,
@@ -99,7 +99,7 @@ export const register = async (req, res) => {
         image.mv(`./public/uploads/${imageName}.png`);
 
         //comprobar si el usuario existe
-        const user = await models.findOneByEmail(email);
+        const user = await findOneByEmail(email);
         if (user) {
             return res.render('register', {
                 title: 'Register Page',
@@ -111,8 +111,7 @@ export const register = async (req, res) => {
         //hashear la contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
 
-
-        const response = await models.register({
+        const response = await register({
             name,
             email,
             experience,
@@ -147,7 +146,7 @@ export const login = async (req, res) => {
             });
         };
 
-        const user = await models.findOneByEmail(email);
+        const user = await findOneByEmail(email);
         if (!user) {
             return res.render('login', {
                 title: 'Login Page',
@@ -188,7 +187,7 @@ export const update = async (req, res) => {
     let hashedPassword = await bcrypt.hash(password, 10);
     password = hashedPassword;
     try {
-        await models.updateUser(name, experience, especialty, password, id);
+        await updateUser(name, experience, especialty, password, id);
         res.status(200).redirect('/');
     } catch (error) {
         res.status(500).send(error.message);
@@ -197,7 +196,7 @@ export const update = async (req, res) => {
 export const deleteUser = async (req, res) => {
     const { id } = req.params;
     try {
-        await models.deleteUser(id);
+        await deleteUserQuery(id);
         res.status(200).redirect('/');
     } catch (error) {
         res.status(500).send(error.message);
@@ -208,7 +207,7 @@ export const setStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     try {
-        await models.setStatus(id, status);
+        await setStatusQuery(id, status);
         res.status(200).redirect('/admin');
     } catch (error) {
         res.status(500).send(error.message);

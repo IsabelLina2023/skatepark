@@ -1,5 +1,5 @@
 import { pool } from '../config/db.js';
-export const register = async (name, email, experience, especialty, password, image) => {
+export const register = async ({name, email, experience, especialty, password, image}) => {
     try {
         const sql = {
             text: 'INSERT INTO skaters (name, email, experience, especialty, password, image) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
@@ -61,7 +61,7 @@ export const updateUser = async (name, experience, especialty, password, id) => 
         console.log('Error code: ', error.code, 'Error message: ', error.message);
     };
 };
-export const deleteUser = async (id) => {
+export const deleteUserQuery = async (id) => {
     try {
         const sql = {
             text: 'DELETE FROM skaters WHERE id = $1 RETURNING *',
@@ -77,7 +77,7 @@ export const deleteUser = async (id) => {
     };
 };
 
-export const setStatus = async (id, status) => {
+export const setStatusQuery = async (id, status) => {
     try {
         const sql = {
             text: 'UPDATE skaters SET status = $1 WHERE id = $2 RETURNING *',
